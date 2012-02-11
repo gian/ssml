@@ -10,4 +10,6 @@ struct
         (case List.find (fn (i',_) => i = i') (!tab) of
             NONE => raise UnknownSymbol
           | SOME (_,t) => t)
+
+    fun reset () = tab := []
 end

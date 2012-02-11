@@ -77,7 +77,7 @@ struct
     end
       | constrExp (A.Let (l,e,NONE)) =
     let
-        val l' = constrDec l
+        val l' = List.map constrDec l
     in
         constrExp e
     end
@@ -85,12 +85,30 @@ struct
       | constrExp e = 
         raise (Fail ("Unhandled expression in constrExp: " ^ A.ppexp e))
 
-    and constrDec _ = raise (Fail "Not implemented")
+    and constrDec (A.ValBind (i,NONE,e)) =
+    let
+        val (t,e') = constrExp e
+        val _ = Symtab.insert i t
+    in
+        A.ValBind (i, SOME t, e')
+    end
+      | constrDec (A.ValRecBind (i,NONE,e)) =
+    let
+        val t = freshTy ()
+        val _ = Symtab.insert i t
+        val (t',e') = constrExp e
+        val _ = addConstr (t,t')
+    in
+        A.ValRecBind (i, SOME t, e')
+    end
+      | constrDec _ = raise (Fail "Not implemented")
 
     fun printConstr' l = 
             String.concatWith "\n" 
                 (map (fn (t1,t2) => A.ppty t1 ^ " = " ^ A.ppty t2) l)
 
     fun printConstr () = printConstr' (!constraints)
+
+    fun reset () = constraints := []
  end
 
