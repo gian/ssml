@@ -28,6 +28,25 @@ struct
     
     val ppid = Int.toString
 
+
+    fun substinty (TyId n) th (TyId t) =
+            if n = t then th else TyId t
+      | substinty (TyVar n) th (TyVar t) =
+            if n = t then th else TyVar t
+      | substinty tn th (TyCon (t1,t2)) = 
+            TyCon (substinty tn th t1, substinty tn th t2)
+      | substinty tn th (TyArrow (t1,t2)) =
+            TyArrow (substinty tn th t1, substinty tn th t2)
+      | substinty tn th t = t
+
+    fun occursin (tx as TyVar t1) t2 =
+           (case t2 of 
+                TyArrow (t1',t2') => occursin tx t1' orelse occursin tx t2'
+              | TyCon (t1',t2') => occursin tx t1' orelse occursin tx t2'
+              | TyVar t2' => t1 = t2'
+              | _ => false)
+      | occursin _ _ = raise Fail ("Invalid argument to occursin")
+
     fun ppty (TyId i) = "t" ^ ppid i
       | ppty (TyVar i) = "?X" ^ ppid i
       | ppty (TyPoly i) = String.str (Char.chr ((Char.ord #"a") + i))
