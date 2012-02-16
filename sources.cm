@@ -1,5 +1,5 @@
 Group is
-	$/basis.cm
+	$SMACKAGE/cmlib/v1/cmlib.cm
 	examples.sml
 	hm.sml
 	symtab.sml
